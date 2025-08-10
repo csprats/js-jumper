@@ -6,7 +6,8 @@ const character = {
     y: canvas.height / 2,
     jumpUp: false,
     jumpDown: false,
-    jumpSpeed: 5,
+    jumpSpeed: 8,
+    jumpDirection: 0,
     frame: 0
 }
 
@@ -21,9 +22,15 @@ character2.onload = draw
 
 
 const obstacle = {
-    x: canvas.width - 50,
-    y: canvas.height / 2
+    x: canvas.width,
+    y: canvas.height / 2,
+    speed: 15,
 }
+let obstacles = [{
+    x: canvas.width - 50,
+    y: canvas.height / 2,
+    speed: 15,}
+]
 
 const obstacleImage  = new Image()
 obstacleImage.src = '/obstacle.png'
@@ -38,13 +45,13 @@ function changeCharacter() {
 
 function drawCharacter() {
     if (character.jumpUp) {
-        character.jumpSpeed = -5
+        character.jumpDirection = -character.jumpSpeed
     }
 
     if (character.y < canvas.height / 2 - 150 && character.jumpUp) {
         character.jumpUp = false
         character.jumpDown = true
-        character.jumpSpeed = 5
+        character.jumpDirection = character.jumpSpeed
     }
 
     if (character.y === canvas.height / 2  && character.jumpDown) {
@@ -53,14 +60,31 @@ function drawCharacter() {
     }
 
     if (character.jumpUp || character.jumpDown) {
-        character.y += character.jumpSpeed
+        character.y += character.jumpDirection 
     }
 
     ctx.drawImage(actualCharacter, character.x, character.y)
 }
 
+function createObstacle(offset)  {
+    obstacles.push(obstacle)
+    obstacles[obstacles.length - 1].x -= offset
+}
+
 function drawObstacle()  {
-    ctx.drawImage(obstacleImage, obstacle.x, obstacle.y)
+    obstacles = obstacles.filter((obstacl) => {
+        if (obstacl.x < 0) {
+            /*createObstacle(0)
+            createObstacle(250)*/
+
+            return false
+        }
+
+        ctx.drawImage(obstacleImage, obstacl.x, obstacl.y)
+        obstacl.x -= obstacl.speed
+
+        return true
+    })
 }
 
 function draw() {
@@ -76,5 +100,11 @@ document.addEventListener('keydown', (e) => {
         character.jumpUp = true
     }
 })
+canvas.addEventListener('click', () => { 
+    if (!character.jumpDown && !character.jumpUp) {
+        character.jumpUp = true
+    }
+})
 
+createObstacle(250)
 setInterval(changeCharacter, 250)
