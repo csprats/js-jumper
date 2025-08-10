@@ -19,6 +19,15 @@ let actualCharacter = character1
 
 character2.onload = draw
 
+
+const obstacle = {
+    x: canvas.width - 50,
+    y: canvas.height / 2
+}
+
+const obstacleImage  = new Image()
+obstacleImage.src = '/obstacle.png'
+
 function changeCharacter() {
     if (character.frame === 0) actualCharacter = character1
     if (character.frame === 1) actualCharacter = character2
@@ -50,9 +59,14 @@ function drawCharacter() {
     ctx.drawImage(actualCharacter, character.x, character.y)
 }
 
+function drawObstacle()  {
+    ctx.drawImage(obstacleImage, obstacle.x, obstacle.y)
+}
+
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     drawCharacter()
+    drawObstacle()
 
     requestAnimationFrame(draw)
 }
