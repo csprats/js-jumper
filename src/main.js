@@ -20,20 +20,16 @@ let actualCharacter = character1
 
 character2.onload = draw
 
-
-const obstacle = {
-    x: canvas.width,
-    y: canvas.height / 2,
-    speed: 15,
-}
 let obstacles = [{
     x: canvas.width - 50,
     y: canvas.height / 2,
-    speed: 15,}
-]
+    speed: 15,
+}]
 
 const obstacleImage  = new Image()
 obstacleImage.src = '/obstacle.png'
+
+let gameOver = false
 
 function changeCharacter() {
     if (character.frame === 0) actualCharacter = character1
@@ -66,24 +62,34 @@ function drawCharacter() {
     ctx.drawImage(actualCharacter, character.x, character.y)
 }
 
+function detectCollision(obstacl) {
+    if (character.x + 48 > obstacl.x &&
+        character.x < obstacl.x + 48 &&
+        character.y + 48 > obstacl.y &&
+        character.y < obstacl.y + 48)
+    {
+        gameOver = true
+    }
+}
+
 function createObstacle(offset)  {
-    obstacles.push(obstacle)
-    obstacles[obstacles.length - 1].x -= offset
+    obstacles.push({
+        x: offset,
+        y: canvas.height / 2,
+        speed: 15
+    })
 }
 
 function drawObstacle()  {
-    obstacles = obstacles.filter((obstacl) => {
+    obstacles.forEach(function(obstacl, i) {
         if (obstacl.x < 0) {
-            /*createObstacle(0)
-            createObstacle(250)*/
-
-            return false
+            obstacl.x = canvas.width
         }
 
         ctx.drawImage(obstacleImage, obstacl.x, obstacl.y)
         obstacl.x -= obstacl.speed
 
-        return true
+        detectCollision(obstacl)
     })
 }
 
@@ -92,7 +98,15 @@ function draw() {
     drawCharacter()
     drawObstacle()
 
-    requestAnimationFrame(draw)
+    if (!gameOver) requestAnimationFrame(draw)
+    else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        ctx.font = '50px Arial'
+        ctx.fillStyle = 'black'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillText("Game Over!", canvas.width / 2, canvas.height / 2)
+    }
 }
 
 document.addEventListener('keydown', (e) => {
@@ -106,5 +120,8 @@ canvas.addEventListener('click', () => {
     }
 })
 
-createObstacle(250)
+createObstacle(150)
 setInterval(changeCharacter, 250)
+setInterval(() => {
+    createObstacle(Math.random() * 50)
+}, 7000)
