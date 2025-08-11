@@ -20,14 +20,26 @@ let actualCharacter = character1
 
 character2.onload = draw
 
-let obstacles = [{
+const obstaclesSpeed = 15
+let obstacles = [
+    {
     x: canvas.width - 50,
     y: canvas.height / 2,
-    speed: 15,
-}]
+    speed: obstaclesSpeed,
+    },
+    {
+    x: canvas.width + 150,
+    y: canvas.height / 2,
+    speed: obstaclesSpeed,
+    }
+]
 
 const obstacleImage  = new Image()
 obstacleImage.src = '/obstacle.png'
+
+const backgroundImage = new Image()
+backgroundImage.src = '/background.png'
+let offset = 0
 
 let gameOver = false
 
@@ -76,7 +88,7 @@ function createObstacle(offset)  {
     obstacles.push({
         x: offset,
         y: canvas.height / 2,
-        speed: 15
+        speed: obstaclesSpeed
     })
 }
 
@@ -93,14 +105,21 @@ function drawObstacle()  {
     })
 }
 
+function drawBackground() {
+    for (let i = offset; i < canvas.width; i += backgroundImage.width) {
+        ctx.drawImage(backgroundImage, i, (canvas.height / 2) - (backgroundImage.height / 2))
+    }
+    offset -= obstaclesSpeed
+}
+
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
+    drawBackground()
     drawCharacter()
     drawObstacle()
 
     if (!gameOver) requestAnimationFrame(draw)
     else {
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
         ctx.font = '50px Arial'
         ctx.fillStyle = 'black'
         ctx.textAlign = 'center'
@@ -120,7 +139,6 @@ canvas.addEventListener('click', () => {
     }
 })
 
-createObstacle(150)
 setInterval(changeCharacter, 250)
 setInterval(() => {
     createObstacle(Math.random() * 50)
